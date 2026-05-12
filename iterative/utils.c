@@ -1,5 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 #include "server.h"
+#include "logger.h"
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -7,12 +8,12 @@
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
+#include <syslog.h>
 
 void close_fd(int fd, const char *label) {
 
   if (close(fd) < 0) {
-    fprintf(stderr, "Error closing %s: ", label);
-    perror(NULL);
+    logger(LOG_ERR, "Error closing %s: %s", label, strerror(errno));
   }
 }
 
@@ -23,7 +24,7 @@ ssize_t safe_dprintf(int fd, const char *format, ...) {
   va_end(args);
 
   if (ret < 0) {
-    perror("dprintf error: ");
+    logger(LOG_ERR, "dprintf error: %s", strerror(errno));
   }
   return ret;
 }

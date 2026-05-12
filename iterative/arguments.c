@@ -1,5 +1,6 @@
 #include "config.h"
 #include "arguments.h"
+#include "logger.h"
 #include <string.h>
 #include <argp.h>
 #include <unistd.h>  // for geteuid()
@@ -8,6 +9,7 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <errno.h>      // perror()
+#include <syslog.h>
 
 static struct argp_option options[] = {
   { "port",    'p', "PORT", 0, PORT_DOC, 0 },
@@ -26,7 +28,7 @@ static int is_valid_local_ip(const char *ip_str) {
   int found = 0;
 
   if (getifaddrs(&ifaddr) == -1) {
-    perror("getifaddrs");
+    logger(LOG_ERR, "getifaddrs: %s", strerror(errno));
     return 0;
   }
 
